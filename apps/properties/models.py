@@ -29,11 +29,11 @@ class Property(TimeStampedUUIDModel):
         COMMERCIAL = 'Commercial', _('Commercial')
         OTHER = 'Other', _('Other')
 
-    user = models.ForeignKey(User,related_name='agent_buyer',on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(User,verbose_name=_("Agent,Buyer or Seller"),related_name='agent_buyer',on_delete=models.DO_NOTHING)
     title = models.CharField(verbose_name=_("Property Title"),max_length=250)
     slug = AutoSlugField(populate_from='title',unique=True,verbose_name=_("Slug"),always_update=True)
     ref_code = models.CharField(verbose_name=_("Property Reference Code"),max_length=255,unique=True,blank=True,null=True)
-    description = models.TextField(verbose_name=_("Property Description"),blank=True,null=True)
+    description = models.TextField(verbose_name=_("Property Description"),default="Add small description of your property",blank=True,null=True)
     country = CountryField(verbose_name=_("Country"),default="IND",blank_label= "Select country",blank=False,null=False)
     city = models.CharField(verbose_name=_("City"),max_length=180,default="Mumbai",blank=False,null=False)
     postal_code = models.CharField(verbose_name=_("Postal Code"),max_length=100,default="401501")
@@ -48,9 +48,10 @@ class Property(TimeStampedUUIDModel):
     advert_type = models.CharField(verbose_name=_("Advert Type"),max_length=50,choices=AdvertType.choices,default=AdvertType.FOR_SALE)
     property_type = models.CharField(verbose_name=_("Property Type"),max_length=50,choices=PropertyType.choices,default=PropertyType.APARTMENT)
     cover_photo = models.ImageField(verbose_name=_("Main Photo"),default = "/house_sample.jpg",upload_to="properties/cover_photos/",blank=True,null=True)
+    photo1 = models.ImageField(default = "/interior_sample.jpg",upload_to="properties/cover_photos/",blank=True,null=True)
+    photo2 = models.ImageField(default = "/interior_sample.jpg",upload_to="properties/cover_photos/",blank=True,null=True)    
     photo3 = models.ImageField(default = "/interior_sample.jpg",upload_to="properties/cover_photos/",blank=True,null=True)
     photo4 = models.ImageField(default = "/interior_sample.jpg",upload_to="properties/cover_photos/",blank=True,null=True)
-    photo2 = models.ImageField(default = "/interior_sample.jpg",upload_to="properties/cover_photos/",blank=True,null=True)
     published_status = models.BooleanField(verbose_name=_("Published Status"),default=False)
     views = models.IntegerField(verbose_name=_("Total Views"),default=0)
     objects = models.Manager()
@@ -65,7 +66,7 @@ class Property(TimeStampedUUIDModel):
     
     def save(self,*args,**kwargs):
         self.title = str.title(self.title)
-        self.description = str.description(self.description)
+        self.description = str.capitalize(self.description)
         self.ref_code = "".join(random.choices(string.ascii_uppercase+string.digits,k=10))
 
         super(Property,self).save(*args,**kwargs)
@@ -78,7 +79,7 @@ class Property(TimeStampedUUIDModel):
         price_after_tax = float(round(property_price+tax_amount,2))
         return price_after_tax
 
-class PropertViews(TimeStampedUUIDModel):
+class PropertyViews(TimeStampedUUIDModel):
     ip = models.CharField(max_length=250,verbose_name = _('IP Address'))
     property = models.ForeignKey(Property,related_name ='property_views',on_delete = models.CASCADE )
 

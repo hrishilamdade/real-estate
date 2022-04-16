@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Property,PropertViews
+from .models import Property,PropertyViews
 # Register your models here.
 
 class PropertyAdmin(admin.ModelAdmin):
@@ -8,4 +8,4 @@ class PropertyAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Property,PropertyAdmin)
-admin.site.register(PropertViews)
+admin.site.register(PropertyViews)
